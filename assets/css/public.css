@@ -1,0 +1,10 @@
+/* Public styles */
+.nvb-directory { display:flex; flex-wrap:wrap; gap:16px; }
+.nvb-country-card { width: calc(25% - 16px); border:1px solid #eee; padding:12px; border-radius:6px; box-shadow:0 0 6px rgba(0,0,0,0.03); }
+.nvb-country-card img { width:48px; height:32px; object-fit:cover; }
+.nvb-checklist { border:1px solid #eee; padding:12px; border-radius:6px; }
+.nvb-steps { list-style: none; padding-left:0; }
+.nvb-step { margin-bottom: 12px; padding:8px; border-left:4px solid #0073aa; background:#f9f9f9; }
+.nvb-col-table { width:100%; border-collapse:collapse; }
+.nvb-col-table th, .nvb-col-table td { border:1px solid #eee; padding:8px; text-align:left; }
+@media (max-width:800px){ .nvb-country-card{ width:100%; } }
