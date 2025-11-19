@@ -25,20 +25,42 @@ class NVB_Shortcodes {
 	}
 
 	public static function country_detail( $atts = array() ) {
-		$atts = shortcode_atts( array( 'id' => '' ), $atts, 'nvb_country_detail' );
+		// پہلے جیسا: shortcode attributes
+		$atts = shortcode_atts(
+			array(
+				'id' => '',
+			),
+			$atts,
+			'nvb_country_detail'
+		);
+
+		// ✨ نیا logic: اگر shortcode میں id خالی ہو تو URL سے ?country=slug پکڑیں
+		if ( empty( $atts['id'] ) && isset( $_GET['country'] ) ) {
+			// wp_unslash تاکہ magic quotes وغیرہ ہٹ جائیں، پھر sanitize
+			$atts['id'] = sanitize_text_field( wp_unslash( $_GET['country'] ) );
+		}
+
+		// اگر پھر بھی id خالی ہو تو error دکھائیں
+		if ( empty( $atts['id'] ) ) {
+			return '<p>' . esc_html__( 'No country selected.', 'nvb' ) . '</p>';
+		}
+
+		// باقی سب پہلے جیسا ہی: nvb_get_country id یا slug سے ریکارڈ نکالے گا
 		$country = nvb_get_country( $atts['id'] );
 		if ( ! $country ) {
 			return '<p>' . esc_html__( 'Country not found.', 'nvb' ) . '</p>';
 		}
+
 		global $wpdb;
 		$prefix = $wpdb->prefix;
 		$visa_programs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$prefix}nvb_visa_programs WHERE country_id = %d AND is_deleted = 0", $country->id ) );
-		$eligibility = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$prefix}nvb_eligibility WHERE country_id = %d AND is_deleted = 0", $country->id ) );
-		$documents = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$prefix}nvb_documents WHERE country_id = %d AND is_deleted = 0", $country->id ) );
-		$steps = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$prefix}nvb_application_steps WHERE country_id = %d AND is_deleted = 0 ORDER BY step_number ASC", $country->id ) );
-		$tax = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$prefix}nvb_tax_info WHERE country_id = %d AND is_deleted = 0", $country->id ) );
-		$col = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$prefix}nvb_cost_of_living WHERE country_id = %d AND is_deleted = 0", $country->id ) );
-		$faqs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$prefix}nvb_faqs WHERE country_id = %d AND is_deleted = 0", $country->id ) );
+		$eligibility   = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$prefix}nvb_eligibility WHERE country_id = %d AND is_deleted = 0", $country->id ) );
+		$documents     = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$prefix}nvb_documents WHERE country_id = %d AND is_deleted = 0", $country->id ) );
+		$steps         = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$prefix}nvb_application_steps WHERE country_id = %d AND is_deleted = 0 ORDER BY step_number ASC", $country->id ) );
+		$tax           = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$prefix}nvb_tax_info WHERE country_id = %d AND is_deleted = 0", $country->id ) );
+		$col           = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$prefix}nvb_cost_of_living WHERE country_id = %d AND is_deleted = 0", $country->id ) );
+		$faqs          = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$prefix}nvb_faqs WHERE country_id = %d AND is_deleted = 0", $country->id ) );
+
 		ob_start();
 		include NVB_PLUGIN_DIR . 'templates/frontend/detail.php';
 		return ob_get_clean();
