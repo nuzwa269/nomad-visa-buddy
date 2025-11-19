@@ -1,0 +1,6 @@
+/* Basic admin styles for Nomad Visa Hub */
+.nvb-admin-wrap { padding: 20px; background: #fff; }
+.nvb-list-table { width: 100%; border-collapse: collapse; }
+.nvb-list-table th, .nvb-list-table td { padding: 8px; border-bottom: 1px solid #eaeaea; }
+.nvb-form input[type="text"], .nvb-form textarea, .nvb-form select { width: 100%; padding: 6px; box-sizing: border-box; }
+.nvb-flag { width: 32px; height: 20px; object-fit: cover; display:inline-block; margin-right:8px; }
