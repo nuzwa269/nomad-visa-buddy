@@ -52,7 +52,7 @@ $message = isset( $_GET['message'] ) ? sanitize_text_field( wp_unslash( $_GET['m
 			<div class="notice notice-error"><p><?php esc_html_e( 'Please select a country and enter a question.', 'nvb' ); ?></p></div>
 		<?php endif; ?>
 	<?php endif; ?>
-
+ 
 	<hr />
 
 	<h2>
