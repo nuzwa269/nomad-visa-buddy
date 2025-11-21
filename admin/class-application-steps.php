@@ -1,15 +1,15 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 class NVB_Application_Steps {
 
 	public static function init() {
 
-		// Create / Update
-		add_action( 'admin_post_nvb_save_step', array( __CLASS__, 'save_step' ) );
-
-		// Soft delete
-		add_action( 'admin_post_nvb_delete_step', array( __CLASS__, 'delete_step' ) );
+		// Correct hooks for saving and deleting
+		add_action( 'admin_post_nvb_save_application_step', array( __CLASS__, 'save_step' ) );
+		add_action( 'admin_post_nvb_delete_application_step', array( __CLASS__, 'delete_step' ) );
 	}
 
 	public static function application_steps_page() {
@@ -25,8 +25,14 @@ class NVB_Application_Steps {
 			wp_die( __( 'Unauthorized', 'nvb' ) );
 		}
 
-		if ( empty( $_POST['nvb_step_nonce'] ) ||
-		     ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nvb_step_nonce'] ) ), 'nvb_save_step' ) ) {
+		// Correct nonce name
+		if (
+			empty( $_POST['nvb_application_step_nonce'] ) ||
+			! wp_verify_nonce(
+				sanitize_text_field( wp_unslash( $_POST['nvb_application_step_nonce'] ) ),
+				'nvb_save_application_step'
+			)
+		) {
 			wp_die( __( 'Invalid nonce', 'nvb' ) );
 		}
 
@@ -38,6 +44,8 @@ class NVB_Application_Steps {
 		$step_number = intval( $_POST['step_number'] ?? 0 );
 		$title       = sanitize_text_field( $_POST['title'] ?? '' );
 		$description = wp_kses_post( $_POST['description'] ?? '' );
+		$external_link  = esc_url_raw( $_POST['external_link'] ?? '' );
+		$screenshot_url = esc_url_raw( $_POST['screenshot_url'] ?? '' );
 
 		if ( empty( $title ) || ! $country_id ) {
 			wp_redirect( admin_url( 'admin.php?page=nvb_application_steps&message=missing' ) );
@@ -49,14 +57,16 @@ class NVB_Application_Steps {
 			$wpdb->update(
 				"{$prefix}nvb_application_steps",
 				array(
-					'country_id'  => $country_id,
-					'step_number' => $step_number,
-					'title'       => $title,
-					'description' => $description,
-					'updated_at'  => current_time( 'mysql' ),
+					'country_id'     => $country_id,
+					'step_number'    => $step_number,
+					'title'          => $title,
+					'description'    => $description,
+					'external_link'  => $external_link,
+					'screenshot_url' => $screenshot_url,
+					'updated_at'     => current_time( 'mysql' ),
 				),
 				array( 'id' => $id ),
-				array( '%d', '%d', '%s', '%s', '%s' ),
+				array( '%d', '%d', '%s', '%s', '%s', '%s', '%s' ),
 				array( '%d' )
 			);
 
@@ -67,15 +77,17 @@ class NVB_Application_Steps {
 			$wpdb->insert(
 				"{$prefix}nvb_application_steps",
 				array(
-					'country_id'  => $country_id,
-					'step_number' => $step_number,
-					'title'       => $title,
-					'description' => $description,
-					'is_deleted'  => 0,
-					'created_at'  => current_time( 'mysql' ),
-					'updated_at'  => current_time( 'mysql' ),
+					'country_id'     => $country_id,
+					'step_number'    => $step_number,
+					'title'          => $title,
+					'description'    => $description,
+					'external_link'  => $external_link,
+					'screenshot_url' => $screenshot_url,
+					'is_deleted'     => 0,
+					'created_at'     => current_time( 'mysql' ),
+					'updated_at'     => current_time( 'mysql' ),
 				),
-				array( '%d', '%d', '%s', '%s', '%d', '%s', '%s' )
+				array( '%d', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
 			);
 
 			$message = 'created';
@@ -94,11 +106,12 @@ class NVB_Application_Steps {
 			wp_die( __( 'Unauthorized', 'nvb' ) );
 		}
 
+		// Correct nonce
 		if (
 			empty( $_GET['_wpnonce'] ) ||
 			! wp_verify_nonce(
 				sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ),
-				'nvb_delete_step'
+				'nvb_delete_application_step'
 			)
 		) {
 			wp_die( __( 'Invalid nonce', 'nvb' ) );
