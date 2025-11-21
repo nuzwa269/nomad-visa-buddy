@@ -94,4 +94,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</button>
 		</p>
 	</form>
+
+	<hr />
+
+	<h2>Documents Checklist</h2>
+	<form
+		method="post"
+		action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
+		enctype="multipart/form-data"
+	>
+		<?php wp_nonce_field( 'nvb_bulk_documents_action', 'nvb_bulk_documents_nonce' ); ?>
+		<input type="hidden" name="action" value="nvb_bulk_import_documents" />
+
+		<p>
+			<label for="nvb_documents_csv">
+				Upload Documents CSV
+				(<code>country_slug,title,is_required,notes</code> — ہر ملک کیلئے جتنے ڈاکومنٹس چاہیں):
+			</label>
+			<br />
+			<input type="file" name="nvb_documents_csv" id="nvb_documents_csv" accept=".csv" />
+		</p>
+
+		<p>
+			<button type="submit" class="button button-primary">
+				Import Documents
+			</button>
+		</p>
+	</form>
 </div>
