@@ -122,3 +122,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</p>
 	</form>
 </div>
+	<hr />
+
+	<h2>Application Steps</h2>
+	<form
+		method="post"
+		action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
+		enctype="multipart/form-data"
+	>
+		<?php wp_nonce_field( 'nvb_bulk_steps_action', 'nvb_bulk_steps_nonce' ); ?>
+		<input type="hidden" name="action" value="nvb_bulk_import_steps" />
+
+		<p>
+			<label for="nvb_steps_csv">
+				Upload Application Steps CSV
+				(<code>country_slug,step_number,title,description,external_link,screenshot_url</code>):
+			</label>
+			<br />
+			<input type="file" name="nvb_steps_csv" id="nvb_steps_csv" accept=".csv" />
+		</p>
+
+		<p>
+			<button type="submit" class="button button-primary">
+				Import Application Steps
+			</button>
+		</p>
+	</form>
