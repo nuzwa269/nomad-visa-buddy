@@ -8,7 +8,7 @@ class NVB_Cost_Of_Living {
 		// save (create / update)
 		add_action( 'admin_post_nvb_save_col', array( __CLASS__, 'save_col' ) );
 
-		// delete
+		// delete (soft delete)
 		add_action( 'admin_post_nvb_delete_col', array( __CLASS__, 'delete_col' ) );
 	}
 
@@ -26,24 +26,30 @@ class NVB_Cost_Of_Living {
 		}
 
 		if ( empty( $_POST['nvb_col_nonce'] ) ||
-		     ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nvb_col_nonce'] ) ), 'nvb_save_col' ) ) {
+		     ! wp_verify_nonce(
+			     sanitize_text_field( wp_unslash( $_POST['nvb_col_nonce'] ) ),
+			     'nvb_save_col'
+		     ) ) {
 			wp_die( __( 'Invalid nonce', 'nvb' ) );
 		}
 
 		global $wpdb;
 		$prefix = $wpdb->prefix;
 
-		$id                 = intval( $_POST['id'] ?? 0 );
-		$country_id         = intval( $_POST['country_id'] ?? 0 );
-		$rent               = sanitize_text_field( $_POST['rent'] ?? '' );
-		$food               = sanitize_text_field( $_POST['food'] ?? '' );
-		$transport          = sanitize_text_field( $_POST['transport'] ?? '' );
-		$internet           = sanitize_text_field( $_POST['internet'] ?? '' );
-		$coworking          = sanitize_text_field( $_POST['coworking'] ?? '' );
-		$monthly_estimate   = sanitize_text_field( $_POST['monthly_estimate'] ?? '' );
-		$notes              = wp_kses_post( $_POST['notes'] ?? '' );
+		$id             = intval( $_POST['id'] ?? 0 );
+		$country_id     = intval( $_POST['country_id'] ?? 0 );
 
-		if ( ! $country_id || empty( $monthly_estimate ) ) {
+		// decimal fields as strings, DB خود cast کر لے گا
+		$rent           = isset( $_POST['rent'] ) ? sanitize_text_field( $_POST['rent'] ) : '';
+		$food           = isset( $_POST['food'] ) ? sanitize_text_field( $_POST['food'] ) : '';
+		$transport      = isset( $_POST['transport'] ) ? sanitize_text_field( $_POST['transport'] ) : '';
+		$internet       = isset( $_POST['internet'] ) ? sanitize_text_field( $_POST['internet'] ) : '';
+		$healthcare     = isset( $_POST['healthcare'] ) ? sanitize_text_field( $_POST['healthcare'] ) : '';
+		$lifestyle_score= isset( $_POST['lifestyle_score'] ) ? intval( $_POST['lifestyle_score'] ) : 50;
+
+		$notes          = wp_kses_post( $_POST['notes'] ?? '' );
+
+		if ( ! $country_id ) {
 			wp_redirect( admin_url( 'admin.php?page=nvb_cost_of_living&message=missing' ) );
 			exit;
 		}
@@ -53,18 +59,18 @@ class NVB_Cost_Of_Living {
 			$wpdb->update(
 				"{$prefix}nvb_cost_of_living",
 				array(
-					'country_id'       => $country_id,
-					'rent'             => $rent,
-					'food'             => $food,
-					'transport'        => $transport,
-					'internet'         => $internet,
-					'coworking'        => $coworking,
-					'monthly_estimate' => $monthly_estimate,
-					'notes'            => $notes,
-					'updated_at'       => current_time( 'mysql' ),
+					'country_id'      => $country_id,
+					'rent'            => $rent,
+					'food'            => $food,
+					'transport'       => $transport,
+					'internet'        => $internet,
+					'healthcare'      => $healthcare,
+					'lifestyle_score' => $lifestyle_score,
+					'notes'           => $notes,
+					'updated_at'      => current_time( 'mysql' ),
 				),
 				array( 'id' => $id ),
-				array( '%d','%s','%s','%s','%s','%s','%s','%s','%s' ),
+				array( '%d','%f','%f','%f','%f','%f','%d','%s','%s' ),
 				array( '%d' )
 			);
 
@@ -75,19 +81,19 @@ class NVB_Cost_Of_Living {
 			$wpdb->insert(
 				"{$prefix}nvb_cost_of_living",
 				array(
-					'country_id'       => $country_id,
-					'rent'             => $rent,
-					'food'             => $food,
-					'transport'        => $transport,
-					'internet'         => $internet,
-					'coworking'        => $coworking,
-					'monthly_estimate' => $monthly_estimate,
-					'notes'            => $notes,
-					'is_deleted'       => 0,
-					'created_at'       => current_time( 'mysql' ),
-					'updated_at'       => current_time( 'mysql' ),
+					'country_id'      => $country_id,
+					'rent'            => $rent,
+					'food'            => $food,
+					'transport'       => $transport,
+					'internet'        => $internet,
+					'healthcare'      => $healthcare,
+					'lifestyle_score' => $lifestyle_score,
+					'notes'           => $notes,
+					'is_deleted'      => 0,
+					'created_at'      => current_time( 'mysql' ),
+					'updated_at'      => current_time( 'mysql' ),
 				),
-				array( '%d','%s','%s','%s','%s','%s','%s','%s','%d','%s','%s' )
+				array( '%d','%f','%f','%f','%f','%f','%d','%s','%d','%s','%s' )
 			);
 
 			$message = 'created';
@@ -107,7 +113,10 @@ class NVB_Cost_Of_Living {
 		}
 
 		if ( empty( $_GET['_wpnonce'] ) ||
-		     ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'nvb_delete_col' ) ) {
+		     ! wp_verify_nonce(
+			     sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ),
+			     'nvb_delete_col'
+		     ) ) {
 			wp_die( __( 'Invalid nonce', 'nvb' ) );
 		}
 
