@@ -6,15 +6,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 global $wpdb;
 $prefix = $wpdb->prefix;
 
-// Countries dropdown کیلئے
+// Countries dropdown
 $countries = $wpdb->get_results(
 	"SELECT id, name FROM {$prefix}nvb_countries WHERE is_deleted = 0 ORDER BY name ASC"
 );
 
-// Edit mode؟
-$edit_id        = isset( $_GET['edit'] ) ? intval( $_GET['edit'] ) : 0;
-$edit_item      = null;
-$eligibility_qs = array();
+// Edit mode?
+$edit_id   = isset( $_GET['edit'] ) ? intval( $_GET['edit'] ) : 0;
+$edit_item = null;
 
 if ( $edit_id ) {
 	$edit_item = $wpdb->get_row(
@@ -25,16 +24,16 @@ if ( $edit_id ) {
 	);
 }
 
-// تمام Q&A لسٹ کیلئے
+// List all eligibility Q&A
 $eligibility_qs = $wpdb->get_results(
 	"SELECT e.*, c.name AS country_name
 	 FROM {$prefix}nvb_eligibility e
 	 LEFT JOIN {$prefix}nvb_countries c ON e.country_id = c.id
 	 WHERE e.is_deleted = 0
-	 ORDER BY c.name ASC, e.sort_order ASC, e.id ASC"
+	 ORDER BY c.name ASC, e.id ASC"
 );
 
-// میسج
+// Message
 $message = isset( $_GET['message'] ) ? sanitize_text_field( wp_unslash( $_GET['message'] ) ) : '';
 ?>
 
@@ -52,7 +51,7 @@ $message = isset( $_GET['message'] ) ? sanitize_text_field( wp_unslash( $_GET['m
 			<div class="notice notice-error"><p><?php esc_html_e( 'Please select a country and enter a question.', 'nvb' ); ?></p></div>
 		<?php endif; ?>
 	<?php endif; ?>
- 
+
 	<hr />
 
 	<h2>
@@ -76,8 +75,7 @@ $message = isset( $_GET['message'] ) ? sanitize_text_field( wp_unslash( $_GET['m
 						<select name="country_id" id="nvb_country_id" class="regular-text">
 							<option value=""><?php esc_html_e( 'Select a country', 'nvb' ); ?></option>
 							<?php foreach ( $countries as $country ) : ?>
-								<option value="<?php echo esc_attr( $country->id ); ?>"
-									<?php selected( $edit_item ? $edit_item->country_id : '', $country->id ); ?>>
+								<option value="<?php echo esc_attr( $country->id ); ?>" <?php selected( $edit_item ? $edit_item->country_id : '', $country->id ); ?>>
 									<?php echo esc_html( $country->name ); ?>
 								</option>
 							<?php endforeach; ?>
@@ -114,19 +112,6 @@ $message = isset( $_GET['message'] ) ? sanitize_text_field( wp_unslash( $_GET['m
 						?>
 					</td>
 				</tr>
-
-				<tr>
-					<th scope="row">
-						<label for="nvb_sort_order"><?php esc_html_e( 'Sort Order', 'nvb' ); ?></label>
-					</th>
-					<td>
-						<input type="number" name="sort_order" id="nvb_sort_order" class="small-text"
-							value="<?php echo esc_attr( $edit_item ? $edit_item->sort_order : 0 ); ?>" />
-						<p class="description">
-							<?php esc_html_e( 'Lower numbers appear first.', 'nvb' ); ?>
-						</p>
-					</td>
-				</tr>
 			</tbody>
 		</table>
 
@@ -150,7 +135,6 @@ $message = isset( $_GET['message'] ) ? sanitize_text_field( wp_unslash( $_GET['m
 					<th><?php esc_html_e( 'ID', 'nvb' ); ?></th>
 					<th><?php esc_html_e( 'Country', 'nvb' ); ?></th>
 					<th><?php esc_html_e( 'Question', 'nvb' ); ?></th>
-					<th><?php esc_html_e( 'Sort Order', 'nvb' ); ?></th>
 					<th><?php esc_html_e( 'Actions', 'nvb' ); ?></th>
 				</tr>
 			</thead>
@@ -160,7 +144,6 @@ $message = isset( $_GET['message'] ) ? sanitize_text_field( wp_unslash( $_GET['m
 						<td><?php echo esc_html( $item->id ); ?></td>
 						<td><?php echo esc_html( $item->country_name ); ?></td>
 						<td><?php echo esc_html( $item->question ); ?></td>
-						<td><?php echo esc_html( $item->sort_order ); ?></td>
 						<td>
 							<?php
 							$edit_url   = admin_url( 'admin.php?page=nvb_eligibility&edit=' . absint( $item->id ) );
