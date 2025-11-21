@@ -7,30 +7,16 @@ class NVB_Application_Steps {
 
 	public static function init() {
 
+		// save / delete handlers
 		add_action( 'admin_post_nvb_save_application_step', array( __CLASS__, 'save_step' ) );
 		add_action( 'admin_post_nvb_delete_application_step', array( __CLASS__, 'delete_step' ) );
-
-		// List page menu (اگر مین مینو یہاں سے بنانا ہو)
-		add_action(
-			'admin_menu',
-			function() {
-				add_submenu_page(
-					'nvb_main',
-					'Application Steps',
-					'Application Steps',
-					'manage_options',
-					'nvb_application_steps',
-					array( __CLASS__, 'application_steps_page' )
-				);
-			}
-		);
 	}
 
 	/**
 	 * Application Steps admin page:
-	 * - action=add  -> Add form
-	 * - action=edit -> Edit form
-	 * - else        -> List view
+	 * ?action=add  -> add form
+	 * ?action=edit -> edit form
+	 * (default)    -> list view
 	 */
 	public static function application_steps_page() {
 		global $wpdb;
@@ -38,14 +24,10 @@ class NVB_Application_Steps {
 
 		$action = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
 
-		/*
-		 * ------------------------
-		 * ADD / EDIT PAGE
-		 * ------------------------
-		 */
+		// ---------- ADD / EDIT -----------
 		if ( 'add' === $action || 'edit' === $action ) {
 
-			// Countries for dropdown.
+			// dropdown کیلئے countries
 			$countries = $wpdb->get_results(
 				"SELECT id, name 
 				 FROM {$prefix}nvb_countries 
@@ -67,22 +49,16 @@ class NVB_Application_Steps {
 				);
 			}
 
-			// فارم والا template (نئی فائل) لوڈ کریں:
-			// templates/admin/application-step-edit.php
+			// فارم والا template (جو آپ نے ابھی بھیجا ہے)
 			include NVB_PLUGIN_DIR . 'templates/admin/application-step-edit.php';
 			return;
 		}
 
-		/*
-		 * ------------------------
-		 * LIST PAGE
-		 * ------------------------
-		 */
+		// ---------- LIST VIEW -----------
 		$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 
 		if ( $search ) {
-			$like = '%' . $wpdb->esc_like( $search ) . '%';
-
+			$like  = '%' . $wpdb->esc_like( $search ) . '%';
 			$steps = $wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT s.*, c.name AS country_name 
@@ -105,13 +81,12 @@ class NVB_Application_Steps {
 			);
 		}
 
-		// لسٹ والا template:
-		// templates/admin/application-steps-list.php
+		// لسٹ والا template
 		include NVB_PLUGIN_DIR . 'templates/admin/application-steps-list.php';
 	}
 
 	/**
-	 * SAVE (Insert / Update)
+	 * SAVE (insert / update)
 	 */
 	public static function save_step() {
 
@@ -121,7 +96,10 @@ class NVB_Application_Steps {
 
 		if (
 			empty( $_POST['nvb_application_step_nonce'] ) ||
-			! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nvb_application_step_nonce'] ) ), 'nvb_save_application_step' )
+			! wp_verify_nonce(
+				sanitize_text_field( wp_unslash( $_POST['nvb_application_step_nonce'] ) ),
+				'nvb_save_application_step'
+			)
 		) {
 			wp_die( 'Invalid nonce' );
 		}
@@ -143,6 +121,7 @@ class NVB_Application_Steps {
 		}
 
 		if ( $id ) {
+			// UPDATE
 			$wpdb->update(
 				"{$prefix}nvb_application_steps",
 				array(
@@ -154,12 +133,15 @@ class NVB_Application_Steps {
 					'screenshot_url' => $screenshot,
 					'updated_at'     => current_time( 'mysql' ),
 				),
-				array( 'id' => $id )
+				array( 'id' => $id ),
+				array( '%d','%d','%s','%s','%s','%s','%s' ),
+				array( '%d' )
 			);
 
 			$msg = 'updated';
 
 		} else {
+			// INSERT
 			$wpdb->insert(
 				"{$prefix}nvb_application_steps",
 				array(
@@ -172,7 +154,8 @@ class NVB_Application_Steps {
 					'is_deleted'     => 0,
 					'created_at'     => current_time( 'mysql' ),
 					'updated_at'     => current_time( 'mysql' ),
-				)
+				),
+				array( '%d','%d','%s','%s','%s','%s','%d','%s','%s' )
 			);
 
 			$msg = 'created';
@@ -183,7 +166,7 @@ class NVB_Application_Steps {
 	}
 
 	/**
-	 * DELETE (Soft delete)
+	 * DELETE (soft delete)
 	 */
 	public static function delete_step() {
 
@@ -217,7 +200,9 @@ class NVB_Application_Steps {
 				'is_deleted' => 1,
 				'updated_at' => current_time( 'mysql' ),
 			),
-			array( 'id' => $id )
+			array( 'id' => $id ),
+			array( '%d','%s' ),
+			array( '%d' )
 		);
 
 		wp_redirect( admin_url( 'admin.php?page=nvb_application_steps&message=deleted' ) );
