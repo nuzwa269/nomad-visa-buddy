@@ -14,14 +14,14 @@ class NVB_Eligibility {
 	}
 
 	/**
-	 * Render admin page (form + list)
+	 * Admin menu page render
 	 */
 	public static function eligibility_page() {
 		include NVB_PLUGIN_DIR . 'templates/admin/eligibility-list.php';
 	}
 
 	/**
-	 * Create / Update eligibility Q&A
+	 * Insert / Update eligibility row
 	 */
 	public static function save_eligibility() {
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -45,7 +45,9 @@ class NVB_Eligibility {
 		$country_id = intval( $_POST['country_id'] ?? 0 );
 		$question   = sanitize_text_field( $_POST['question'] ?? '' );
 		$answer     = wp_kses_post( $_POST['answer'] ?? '' );
-		$sort_order = isset( $_POST['sort_order'] ) ? intval( $_POST['sort_order'] ) : 0;
+
+		// visa_program_id ابھی 0 رکھ دیتے ہیں (future use کیلئے)
+		$visa_program_id = 0;
 
 		if ( empty( $question ) || ! $country_id ) {
 			wp_redirect( admin_url( 'admin.php?page=nvb_eligibility&message=missing' ) );
@@ -53,35 +55,35 @@ class NVB_Eligibility {
 		}
 
 		if ( $id ) {
-			// Update
+			// UPDATE
 			$wpdb->update(
 				"{$prefix}nvb_eligibility",
 				array(
-					'country_id' => $country_id,
-					'question'   => $question,
-					'answer'     => $answer,
-					'sort_order' => $sort_order,
-					'updated_at' => current_time( 'mysql' ),
+					'country_id'     => $country_id,
+					'visa_program_id'=> $visa_program_id,
+					'question'       => $question,
+					'answer'         => $answer,
+					'updated_at'     => current_time( 'mysql' ),
 				),
 				array( 'id' => $id ),
-				array( '%d', '%s', '%s', '%d', '%s' ),
+				array( '%d', '%d', '%s', '%s', '%s' ),
 				array( '%d' )
 			);
 			$message = 'updated';
 		} else {
-			// Insert
+			// INSERT
 			$wpdb->insert(
 				"{$prefix}nvb_eligibility",
 				array(
-					'country_id' => $country_id,
-					'question'   => $question,
-					'answer'     => $answer,
-					'sort_order' => $sort_order,
-					'is_deleted' => 0,
-					'created_at' => current_time( 'mysql' ),
-					'updated_at' => current_time( 'mysql' ),
+					'country_id'      => $country_id,
+					'visa_program_id' => $visa_program_id,
+					'question'        => $question,
+					'answer'          => $answer,
+					'is_deleted'      => 0,
+					'created_at'      => current_time( 'mysql' ),
+					'updated_at'      => current_time( 'mysql' ),
 				),
-				array( '%d', '%s', '%s', '%d', '%d', '%s', '%s' )
+				array( '%d', '%d', '%s', '%s', '%d', '%s', '%s' )
 			);
 			$message = 'created';
 		}
