@@ -85,4 +85,23 @@ function nvb_enqueue_public_assets() {
 	) );
 }
 
+// Modern assets enqueue
+function nvb_enqueue_modern_assets() {
+    wp_enqueue_style(
+        'nvb-modern-style', 
+        NVB_PLUGIN_URL . 'assets/css/modern-style.css',
+        array(),
+        '1.0.0'
+    );
+    
+    wp_enqueue_script(
+        'nvb-modern-script',
+        NVB_PLUGIN_URL . 'assets/js/modern-script.js',
+        array('jquery'),
+        '1.0.0',
+        true
+    );
+}
+add_action('wp_enqueue_scripts', 'nvb_enqueue_modern_assets');
+
 // Uninstall file will be executed when plugin is deleted via WP admin. See uninstall.php
