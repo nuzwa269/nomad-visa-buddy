@@ -4,47 +4,134 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class NVB_Eligibility {
+
 	public static function init() {
+		// Create / Update
 		add_action( 'admin_post_nvb_save_eligibility', array( __CLASS__, 'save_eligibility' ) );
+
+		// Soft delete
+		add_action( 'admin_post_nvb_delete_eligibility', array( __CLASS__, 'delete_eligibility' ) );
 	}
+
+	/**
+	 * Admin menu page render
+	 */
 	public static function eligibility_page() {
 		include NVB_PLUGIN_DIR . 'templates/admin/eligibility-list.php';
 	}
 
+	/**
+	 * Insert / Update eligibility row
+	 */
 	public static function save_eligibility() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Unauthorized', 'nvb' ) );
 		}
-		if ( empty( $_POST['nvb_eligibility_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nvb_eligibility_nonce'] ) ), 'nvb_save_eligibility' ) ) {
+
+		if (
+			empty( $_POST['nvb_eligibility_nonce'] ) ||
+			! wp_verify_nonce(
+				sanitize_text_field( wp_unslash( $_POST['nvb_eligibility_nonce'] ) ),
+				'nvb_save_eligibility'
+			)
+		) {
 			wp_die( esc_html__( 'Invalid nonce', 'nvb' ) );
 		}
+
 		global $wpdb;
 		$prefix = $wpdb->prefix;
 
+		$id         = isset( $_POST['id'] ) ? intval( $_POST['id'] ) : 0;
 		$country_id = intval( $_POST['country_id'] ?? 0 );
-		$visa_program_id = intval( $_POST['visa_program_id'] ?? 0 );
-		$question = sanitize_text_field( $_POST['question'] ?? '' );
-		$answer = wp_kses_post( $_POST['answer'] ?? '' );
+		$question   = sanitize_text_field( $_POST['question'] ?? '' );
+		$answer     = wp_kses_post( $_POST['answer'] ?? '' );
+
+		// visa_program_id ابھی 0 رکھ دیتے ہیں (future use کیلئے)
+		$visa_program_id = 0;
 
 		if ( empty( $question ) || ! $country_id ) {
 			wp_redirect( admin_url( 'admin.php?page=nvb_eligibility&message=missing' ) );
 			exit;
 		}
 
-		$wpdb->insert(
+		if ( $id ) {
+			// UPDATE
+			$wpdb->update(
+				"{$prefix}nvb_eligibility",
+				array(
+					'country_id'     => $country_id,
+					'visa_program_id'=> $visa_program_id,
+					'question'       => $question,
+					'answer'         => $answer,
+					'updated_at'     => current_time( 'mysql' ),
+				),
+				array( 'id' => $id ),
+				array( '%d', '%d', '%s', '%s', '%s' ),
+				array( '%d' )
+			);
+			$message = 'updated';
+		} else {
+			// INSERT
+			$wpdb->insert(
+				"{$prefix}nvb_eligibility",
+				array(
+					'country_id'      => $country_id,
+					'visa_program_id' => $visa_program_id,
+					'question'        => $question,
+					'answer'          => $answer,
+					'is_deleted'      => 0,
+					'created_at'      => current_time( 'mysql' ),
+					'updated_at'      => current_time( 'mysql' ),
+				),
+				array( '%d', '%d', '%s', '%s', '%d', '%s', '%s' )
+			);
+			$message = 'created';
+		}
+
+		wp_redirect( admin_url( 'admin.php?page=nvb_eligibility&message=' . $message ) );
+		exit;
+	}
+
+	/**
+	 * Soft delete (is_deleted = 1)
+	 */
+	public static function delete_eligibility() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Unauthorized', 'nvb' ) );
+		}
+
+		if (
+			empty( $_GET['_wpnonce'] ) ||
+			! wp_verify_nonce(
+				sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ),
+				'nvb_delete_eligibility'
+			)
+		) {
+			wp_die( esc_html__( 'Invalid nonce', 'nvb' ) );
+		}
+
+		$id = isset( $_GET['id'] ) ? intval( $_GET['id'] ) : 0;
+
+		if ( ! $id ) {
+			wp_redirect( admin_url( 'admin.php?page=nvb_eligibility&message=missing' ) );
+			exit;
+		}
+
+		global $wpdb;
+		$prefix = $wpdb->prefix;
+
+		$wpdb->update(
 			"{$prefix}nvb_eligibility",
 			array(
-				'country_id'      => $country_id,
-				'visa_program_id' => $visa_program_id,
-				'question'        => $question,
-				'answer'          => $answer,
-				'created_at'      => current_time( 'mysql' ),
-				'updated_at'      => current_time( 'mysql' ),
+				'is_deleted' => 1,
+				'updated_at' => current_time( 'mysql' ),
 			),
-			array( '%d', '%d', '%s', '%s', '%s', '%s' )
+			array( 'id' => $id ),
+			array( '%d', '%s' ),
+			array( '%d' )
 		);
 
-		wp_redirect( admin_url( 'admin.php?page=nvb_eligibility&message=success' ) );
+		wp_redirect( admin_url( 'admin.php?page=nvb_eligibility&message=deleted' ) );
 		exit;
 	}
 }
