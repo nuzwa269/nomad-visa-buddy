@@ -118,6 +118,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php if ( ! empty( $tax ) ) : ?>
 		<?php foreach ( $tax as $t ) : ?>
 			<h4><?php echo esc_html( $t->info_title ); ?></h4>
+			<?php if ( ! empty( $t->tax_rate ) ) : ?>
+				<p><strong><?php echo esc_html( $t->tax_rate ); ?></strong></p>
+			<?php endif; ?>
 			<p><?php echo wp_kses_post( $t->description ); ?></p>
 		<?php endforeach; ?>
 	<?php else : ?>
