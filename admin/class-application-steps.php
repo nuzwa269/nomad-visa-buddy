@@ -7,24 +7,23 @@ class NVB_Application_Steps {
 
 	public static function init() {
 
-		// Save / delete actions (admin-post.php)
+		// Save & Delete handlers (admin-post.php)
 		add_action( 'admin_post_nvb_save_application_step', array( __CLASS__, 'save_step' ) );
 		add_action( 'admin_post_nvb_delete_application_step', array( __CLASS__, 'delete_step' ) );
 
-		// NOTE: menu / submenu "nvb_application_steps" پہلے ہی NVB_Admin_Menu کے ذریعے بن رہا ہے۔
-		// یہاں admin_menu دوبارہ add نہیں کر رہے، تاکہ کوئی conflict / fatal error نہ آئے۔
+		// Menu عام طور پر NVB_Admin_Menu میں add ہوتا ہے،
+		// اس لیے یہاں دوبارہ add_menu_page کرنے کی ضرورت نہیں۔
 	}
 
 	/**
 	 * Main admin page callback for "Application Steps"
 	 *
 	 * URL examples:
-	 * - admin.php?page=nvb_application_steps            (list)
-	 * - admin.php?page=nvb_application_steps&action=add (add form)
-	 * - admin.php?page=nvb_application_steps&action=edit&id=123 (edit form)
+	 * - admin.php?page=nvb_application_steps
+	 * - admin.php?page=nvb_application_steps&action=add
+	 * - admin.php?page=nvb_application_steps&action=edit&id=123
 	 */
 	public static function application_steps_page() {
-<|diff_marker|> ADD A1000
 		global $wpdb;
 
 		$prefix = $wpdb->prefix;
@@ -40,13 +39,12 @@ class NVB_Application_Steps {
 		 */
 		if ( 'add' === $action || 'edit' === $action ) {
 
-			// Countries dropdown کیلئے ڈیٹا
+            // Countries for dropdown.
 			$countries = $wpdb->get_results(
-				"SELECT id, name 
-				 FROM {$prefix}nvb_countries 
-				 WHERE is_deleted = 0 
+				"SELECT id, name
+				 FROM {$prefix}nvb_countries
+				 WHERE is_deleted = 0
 				 ORDER BY name ASC"
-<|diff_marker|> ADD A1020
 			);
 
 			$step = null;
@@ -56,18 +54,17 @@ class NVB_Application_Steps {
 
 				$step = $wpdb->get_row(
 					$wpdb->prepare(
-						"SELECT * 
-						 FROM {$prefix}nvb_application_steps 
-						 WHERE id = %d 
+						"SELECT *
+						 FROM {$prefix}nvb_application_steps
+						 WHERE id = %d
 						   AND is_deleted = 0",
 						$id
 					)
 				);
 			}
 
-			// 👇 یہ وہ نئی فائل ہے جو فارم دکھائے گی:
-			// wp-content/plugins/nomad-visa-hub/templates/admin/application-step-edit.php
-<|diff_marker|> ADD A1040
+			// فارم والا template:
+			// templates/admin/application-step-edit.php
 			include NVB_PLUGIN_DIR . 'templates/admin/application-step-edit.php';
 			return;
 		}
@@ -84,11 +81,10 @@ class NVB_Application_Steps {
 
 			$steps = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT s.*, c.name AS country_name 
+					"SELECT s.*, c.name AS country_name
 					 FROM {$prefix}nvb_application_steps s
 					 LEFT JOIN {$prefix}nvb_countries c ON c.id = s.country_id
 					 WHERE s.is_deleted = 0
-<|diff_marker|> ADD A1060
 					   AND ( s.title LIKE %s OR c.name LIKE %s )
 					 ORDER BY c.name ASC, s.step_number ASC",
 					$like,
@@ -97,7 +93,7 @@ class NVB_Application_Steps {
 			);
 		} else {
 			$steps = $wpdb->get_results(
-				"SELECT s.*, c.name AS country_name 
+				"SELECT s.*, c.name AS country_name
 				 FROM {$prefix}nvb_application_steps s
 				 LEFT JOIN {$prefix}nvb_countries c ON c.id = s.country_id
 				 WHERE s.is_deleted = 0
@@ -105,12 +101,11 @@ class NVB_Application_Steps {
 			);
 		}
 
-		// 👇 لسٹ والی template:
-		// wp-content/plugins/nomad-visa-hub/templates/admin/application-steps-list.php
+		// لسٹ والا template:
+		// templates/admin/application-steps-list.php
 		include NVB_PLUGIN_DIR . 'templates/admin/application-steps-list.php';
 	}
 
-<|diff_marker|> ADD A1080
 	/**
 	 * SAVE (Insert / Update)
 	 */
@@ -131,7 +126,6 @@ class NVB_Application_Steps {
 		}
 
 		global $wpdb;
-<|diff_marker|> ADD A1100
 		$prefix = $wpdb->prefix;
 
 		$id            = isset( $_POST['id'] ) ? (int) $_POST['id'] : 0;
@@ -152,7 +146,6 @@ class NVB_Application_Steps {
 		}
 
 		if ( $id ) {
-<|diff_marker|> ADD A1120
 			$wpdb->update(
 				"{$prefix}nvb_application_steps",
 				array(
@@ -173,7 +166,6 @@ class NVB_Application_Steps {
 			$wpdb->insert(
 				"{$prefix}nvb_application_steps",
 				array(
-<|diff_marker|> ADD A1140
 					'country_id'     => $country_id,
 					'step_number'    => $step_number,
 					'title'          => $title,
@@ -194,8 +186,7 @@ class NVB_Application_Steps {
 	}
 
 	/**
-<|diff_marker|> ADD A1160
-	 * DELETE (soft delete)
+	 * DELETE (Soft delete)
 	 */
 	public static function delete_step() {
 
@@ -215,7 +206,6 @@ class NVB_Application_Steps {
 
 		$id = isset( $_GET['id'] ) ? (int) $_GET['id'] : 0;
 
-<|diff_marker|> ADD A1180
 		if ( ! $id ) {
 			wp_redirect( admin_url( 'admin.php?page=nvb_application_steps&message=missing' ) );
 			exit;
@@ -236,5 +226,4 @@ class NVB_Application_Steps {
 		wp_redirect( admin_url( 'admin.php?page=nvb_application_steps&message=deleted' ) );
 		exit;
 	}
-<|diff_marker|> ADD A1200
 }
