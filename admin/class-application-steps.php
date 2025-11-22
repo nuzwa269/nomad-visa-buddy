@@ -7,18 +7,18 @@ class NVB_Application_Steps {
 
 	public static function init() {
 
-		// Save & Delete handlers (admin-post.php)
+		// Save & Delete handlers (admin-post.php).
 		add_action( 'admin_post_nvb_save_application_step', array( __CLASS__, 'save_step' ) );
 		add_action( 'admin_post_nvb_delete_application_step', array( __CLASS__, 'delete_step' ) );
 
-		// Menu عام طور پر NVB_Admin_Menu میں add ہوتا ہے،
-		// اس لیے یہاں دوبارہ add_menu_page کرنے کی ضرورت نہیں۔
+		// Menu عام طور پر NVB_Admin_Menu کے ذریعے add ہوتا ہے،
+		// اس لیے یہاں دوبارہ menu بنانے کی ضرورت نہیں۔
 	}
 
 	/**
-	 * Main admin page callback for "Application Steps"
+	 * Main admin page callback for "Application Steps".
 	 *
-	 * URL examples:
+	 * Examples:
 	 * - admin.php?page=nvb_application_steps
 	 * - admin.php?page=nvb_application_steps&action=add
 	 * - admin.php?page=nvb_application_steps&action=edit&id=123
@@ -39,7 +39,7 @@ class NVB_Application_Steps {
 		 */
 		if ( 'add' === $action || 'edit' === $action ) {
 
-            // Countries for dropdown.
+			// Countries for dropdown.
 			$countries = $wpdb->get_results(
 				"SELECT id, name
 				 FROM {$prefix}nvb_countries
@@ -107,7 +107,7 @@ class NVB_Application_Steps {
 	}
 
 	/**
-	 * SAVE (Insert / Update)
+	 * SAVE (Insert / Update).
 	 */
 	public static function save_step() {
 
@@ -186,7 +186,7 @@ class NVB_Application_Steps {
 	}
 
 	/**
-	 * DELETE (Soft delete)
+	 * DELETE (Soft delete).
 	 */
 	public static function delete_step() {
 
