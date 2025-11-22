@@ -80,6 +80,15 @@ $message = isset( $_GET['message'] ) ? sanitize_text_field( wp_unslash( $_GET['m
 			</tr>
 
 			<tr>
+				<th><label for="info_title">Title</label></th>
+				<td>
+					<input type="text" name="info_title" id="info_title" class="regular-text"
+						placeholder="e.g., Income tax notes"
+						value="<?php echo esc_attr( $edit_item ? $edit_item->info_title : '' ); ?>">
+				</td>
+			</tr>
+
+			<tr>
 				<th><label for="tax_rate">Tax Rate / Summary</label></th>
 				<td>
 					<input type="text" name="tax_rate" id="tax_rate" class="regular-text"
@@ -89,14 +98,14 @@ $message = isset( $_GET['message'] ) ? sanitize_text_field( wp_unslash( $_GET['m
 			</tr>
 
 			<tr>
-				<th><label for="details">Detailed Notes</label></th>
+				<th><label for="description">Detailed Notes</label></th>
 				<td>
 					<?php
 					wp_editor(
-						$edit_item ? $edit_item->details : '',
+						$edit_item ? $edit_item->description : '',
 						'nvb_tax_details',
 						array(
-							'textarea_name' => 'details',
+							'textarea_name' => 'description',
 							'textarea_rows' => 5,
 							'media_buttons' => false,
 						)
