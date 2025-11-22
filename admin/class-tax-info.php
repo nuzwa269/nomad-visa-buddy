@@ -33,12 +33,14 @@ class NVB_Tax_Info {
 		global $wpdb;
 		$prefix = $wpdb->prefix;
 
-		$id          = intval( $_POST['id'] ?? 0 );
-		$country_id  = intval( $_POST['country_id'] ?? 0 );
-		$tax_rate    = sanitize_text_field( $_POST['tax_rate'] ?? '' );
-		$details     = wp_kses_post( $_POST['details'] ?? '' );
+		$id         = intval( $_POST['id'] ?? 0 );
+		$country_id = intval( $_POST['country_id'] ?? 0 );
+		$info_title = sanitize_text_field( $_POST['info_title'] ?? '' );
+		$tax_rate   = sanitize_text_field( $_POST['tax_rate'] ?? '' );
+		$description = wp_kses_post( $_POST['description'] ?? '' );
 
-		if ( empty( $tax_rate ) || ! $country_id ) {
+		// Validation – country اور title دونوں ہونے چاہئیں
+		if ( empty( $info_title ) || ! $country_id ) {
 			wp_redirect( admin_url( 'admin.php?page=nvb_tax_info&message=missing' ) );
 			exit;
 		}
@@ -48,13 +50,14 @@ class NVB_Tax_Info {
 			$wpdb->update(
 				"{$prefix}nvb_tax_info",
 				array(
-					'country_id' => $country_id,
-					'tax_rate'   => $tax_rate,
-					'details'    => $details,
-					'updated_at' => current_time( 'mysql' ),
+					'country_id'  => $country_id,
+					'info_title'  => $info_title,
+					'tax_rate'    => $tax_rate,
+					'description' => $description,
+					'updated_at'  => current_time( 'mysql' ),
 				),
 				array( 'id' => $id ),
-				array( '%d', '%s', '%s', '%s' ),
+				array( '%d', '%s', '%s', '%s', '%s' ),
 				array( '%d' )
 			);
 
@@ -65,14 +68,15 @@ class NVB_Tax_Info {
 			$wpdb->insert(
 				"{$prefix}nvb_tax_info",
 				array(
-					'country_id' => $country_id,
-					'tax_rate'   => $tax_rate,
-					'details'    => $details,
-					'is_deleted' => 0,
-					'created_at' => current_time( 'mysql' ),
-					'updated_at' => current_time( 'mysql' ),
+					'country_id'  => $country_id,
+					'info_title'  => $info_title,
+					'tax_rate'    => $tax_rate,
+					'description' => $description,
+					'is_deleted'  => 0,
+					'created_at'  => current_time( 'mysql' ),
+					'updated_at'  => current_time( 'mysql' ),
 				),
-				array( '%d', '%s', '%s', '%d', '%s', '%s' )
+				array( '%d', '%s', '%s', '%s', '%d', '%s', '%s' )
 			);
 
 			$message = 'created';
