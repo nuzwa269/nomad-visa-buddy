@@ -2,11 +2,10 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-/** 
- * Expected variables:
- * - $countries : list of countries (id, name)
- * - $step      : null for "add", object for "edit"
+/**
+ * Variables from class:
+ * - $countries : list of country objects (id, name)
+ * - $step      : null for add, object for edit
  */
 ?>
 <div class="wrap nvb-admin-wrap">
@@ -32,9 +31,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<option value=""><?php esc_html_e( 'Select a country', 'nvb' ); ?></option>
 						<?php if ( ! empty( $countries ) ) : ?>
 							<?php foreach ( $countries as $c ) : ?>
-								<option value="<?php echo esc_attr( $c->id ); ?>"
+								<option
+									value="<?php echo esc_attr( $c->id ); ?>"
 									<?php
-									if ( $step && intval( $step->country_id ) === intval( $c->id ) ) {
+									if ( $step && (int) $step->country_id === (int) $c->id ) {
 										echo ' selected';
 									}
 									?>
@@ -89,6 +89,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						id="external_link"
 						class="regular-text"
 						value="<?php echo $step ? esc_attr( $step->external_link ) : ''; ?>"
+						placeholder="https://"
 					/>
 				</td>
 			</tr>
@@ -104,6 +105,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						id="screenshot_url"
 						class="regular-text"
 						value="<?php echo $step ? esc_attr( $step->screenshot_url ) : ''; ?>"
+						placeholder="https://example.com/image.png"
 					/>
 				</td>
 			</tr>
