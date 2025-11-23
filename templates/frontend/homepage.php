@@ -20,26 +20,28 @@ if ( file_exists( $homepage_template ) ) {
     include $homepage_template;
 } else {
     // Fallback content if template not found
-    echo '<div class="homepage-lovable">';
-    echo '<section class="hero-section">';
-    echo '<div class="hero-container">';
-    echo '<h1 class="hero-title">Nomad Visa Hub</h1>';
-    echo '<p class="hero-subtitle">Your easiest path to making your travel dreams come true</p>';
-    echo '<div class="hero-stats">';
-    echo '<div class="stat-item">';
-    echo '<div class="stat-number">50+</div>';
-    echo '<div class="stat-label">Countries</div>';
-    echo '</div>';
-    echo '<div class="stat-item">';
-    echo '<div class="stat-number">100+</div>';
-    echo '<div class="stat-label">Visa Programs</div>';
-    echo '</div>';
-    echo '<div class="stat-item">';
-    echo '<div class="stat-number">10K+</div>';
-    echo '<div class="stat-label">Happy Users</div>';
-    echo '</div>';
-    echo '</div>';
-    echo '</div>';
-    echo '</section>';
-    echo '</div>';
+    ?>
+    <div class="homepage-lovable">
+        <section class="hero-section">
+            <div class="hero-container">
+                <h1 class="hero-title">Nomad Visa Hub</h1>
+                <p class="hero-subtitle">Your easiest path to making your travel dreams come true</p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Countries</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">100+</div>
+                        <div class="stat-label">Visa Programs</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">10K+</div>
+                        <div class="stat-label">Happy Users</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <?php
 }
