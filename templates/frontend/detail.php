@@ -120,10 +120,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</h2>
 					<div style="display: grid; gap: 1rem;">
 						<?php foreach ( $eligibility as $req ) : ?>
-							<div class="visa-program-card" style="border-left: 4px solid var(--secondary-color);">
-								<h4><?php echo esc_html( $req->title ); ?></h4>
-								<?php if ( ! empty( $req->description ) ) : ?>
-									<p><?php echo esc_html( $req->description ); ?></p>
+							<div class="eligibility-card" style="border-left: 4px solid var(--primary-color); background: white; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+								<h4 style="color: var(--text-primary); margin-bottom: 0.75rem; font-size: 1.1rem; font-weight: 600;"><?php echo esc_html( $req->question ); ?></h4>
+								<?php if ( ! empty( $req->answer ) ) : ?>
+									<div style="color: var(--text-secondary); line-height: 1.7; font-size: 0.95rem;">
+										<?php echo wp_kses_post( $req->answer ); ?>
+									</div>
 								<?php endif; ?>
 							</div>
 						<?php endforeach; ?>
