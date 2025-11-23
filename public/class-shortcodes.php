@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class NVB_Shortcodes {
 	public static function init() {
+		add_shortcode( 'nvb_homepage', array( __CLASS__, 'homepage' ) );
 		add_shortcode( 'nvb_country_directory', array( __CLASS__, 'country_directory' ) );
 		add_shortcode( 'nvb_country_detail', array( __CLASS__, 'country_detail' ) );
 		add_shortcode( 'nvb_application_guide', array( __CLASS__, 'application_guide' ) );
@@ -14,7 +15,11 @@ class NVB_Shortcodes {
 		add_action( 'wp_ajax_nvb_export_checklist_csv', array( __CLASS__, 'export_checklist_csv' ) );
 		add_action( 'wp_ajax_nopriv_nvb_export_checklist_csv', array( __CLASS__, 'export_checklist_csv' ) );
 	}
-
+public static function homepage() {
+    ob_start();
+    include NVB_PLUGIN_DIR . 'templates/frontend/homepage.php';
+    return ob_get_clean();
+}
 	public static function country_directory( $atts = array() ) {
 		global $wpdb;
 		$prefix = $wpdb->prefix;
