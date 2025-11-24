@@ -5,11 +5,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <div class="nvb-directory">
-	<?php
-	// وہ پیج جس پر [nvb_country_detail] لگا ہے – slug: country-detail
-	$detail_page = get_page_by_path( 'country-detail' );
-	$detail_url  = $detail_page ? get_permalink( $detail_page ) : site_url();
-	?>
+        <?php
+        // If no detail page is resolved, show a gentle notice so links don’t silently break.
+        if ( empty( $detail_url ) ) {
+                echo '<div class="nvb-notice">' . esc_html__( 'Set the detail_page attribute on the shortcode so country links know where to go.', 'nvb' ) . '</div>';
+                // Fall back to home URL to keep anchors valid, but encourage configuration above.
+                $detail_url = home_url( '/' );
+        }
+        ?>
 
 	<?php if ( ! empty( $countries ) ) : ?>
 		<?php foreach ( $countries as $c ) : ?>

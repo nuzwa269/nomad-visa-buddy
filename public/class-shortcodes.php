@@ -15,14 +15,32 @@ class NVB_Shortcodes {
 		add_action( 'wp_ajax_nopriv_nvb_export_checklist_csv', array( __CLASS__, 'export_checklist_csv' ) );
 	}
 
-	public static function country_directory( $atts = array() ) {
-		global $wpdb;
-		$prefix = $wpdb->prefix;
-		$countries = $wpdb->get_results( "SELECT * FROM {$prefix}nvb_countries WHERE is_deleted = 0 ORDER BY name ASC" );
-		ob_start();
-		include NVB_PLUGIN_DIR . 'templates/frontend/directory.php';
-		return ob_get_clean();
-	}
+        public static function country_directory( $atts = array() ) {
+                $atts = shortcode_atts(
+                        array(
+                                // Detailing page slug or ID; default remains the original slug-based approach.
+                                'detail_page' => 'country-detail',
+                        ),
+                        $atts,
+                        'nvb_country_directory'
+                );
+
+                // Resolve the detail page URL whether the user supplies a slug or an ID.
+                $detail_url = '';
+                if ( is_numeric( $atts['detail_page'] ) ) {
+                        $detail_url = get_permalink( intval( $atts['detail_page'] ) );
+                } elseif ( ! empty( $atts['detail_page'] ) ) {
+                        $page = get_page_by_path( sanitize_title( $atts['detail_page'] ) );
+                        $detail_url = $page ? get_permalink( $page ) : '';
+                }
+
+                global $wpdb;
+                $prefix = $wpdb->prefix;
+                $countries = $wpdb->get_results( "SELECT * FROM {$prefix}nvb_countries WHERE is_deleted = 0 ORDER BY name ASC" );
+                ob_start();
+                include NVB_PLUGIN_DIR . 'templates/frontend/directory.php';
+                return ob_get_clean();
+        }
 
 	public static function country_detail( $atts = array() ) {
 		// پہلے جیسا: shortcode attributes
