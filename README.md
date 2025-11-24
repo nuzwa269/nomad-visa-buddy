@@ -8,11 +8,11 @@ Folder structure and files are ready to be zipped in a folder named "nomad-visa-
 Activation will create custom tables in the WordPress database.
 
 Shortcodes:
-- [nvb_country_directory]
-- [nvb_country_detail id="portugal"]
-- [nvb_application_guide id="estonia"]
-- [nvb_document_checklist id="georgia"]
-- [nvb_cost_of_living id="malaysia"]
+[nvb_country_directory] — ممالک کی فہرست (ڈائریکٹری) دکھاتا ہے۔
+[nvb_country_detail] — کسی منتخب ملک کی تفصیل (Visa programs، اہلیت، دستاویزات وغیرہ) لوڈ کرتا ہے۔
+[nvb_application_guide] — ملک کی اپلیکیشن گائیڈ کے مراحل دکھاتا ہے۔
+[nvb_document_checklist] — مطلوبہ دستاویزات کی چیک لسٹ رینڈر کرتا ہے۔
+[nvb_cost_of_living] — منتخب ملک کے اخراجاتِ  کا بلاک دکھاتا ہے۔
 
 REST endpoints:
 - /wp-json/nvb/v1/countries
